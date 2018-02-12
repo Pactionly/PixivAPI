@@ -1,4 +1,3 @@
 *.class
 /src/test/*
 *.iml
-*.jar
