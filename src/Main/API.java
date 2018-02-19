@@ -2,8 +2,13 @@ package Main;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
+import javax.swing.text.Document;
 import java.io.*;
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class API
@@ -42,6 +47,71 @@ public class API
     public User getUser(String id)
     {
         return new User(sessionID,id);
+    }
+
+    public List<Work> getDailyRankingWorks(int pageNumber)
+    {
+        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=daily&p=" + pageNumber);
+
+        LinkedList<Work> output = new LinkedList<>();
+        Elements result = page.getElementsByClass("ranking-item");
+        String tempID;
+        for(Element ele : result)
+        {
+           tempID =  ele.attr("data-id");
+           output.add(new Work(sessionID, tempID));
+        }
+        return output;
+    }
+
+    public List<Work> getWeeklyRankingWorks(int pageNumber)
+    {
+        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=weekly&p=" + pageNumber);
+
+        LinkedList<Work> output = new LinkedList<>();
+        Elements result = page.getElementsByClass("ranking-item");
+        String tempID;
+        for(Element ele : result)
+        {
+            tempID =  ele.attr("data-id");
+            output.add(new Work(sessionID, tempID));
+        }
+        return output;
+    }
+
+    public List<Work> getMonthlyRankingWorks(int pageNumber)
+    {
+        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=monthly&p=" + pageNumber);
+
+        LinkedList<Work> output = new LinkedList<>();
+        Elements result = page.getElementsByClass("ranking-item");
+        String tempID;
+        for(Element ele : result)
+        {
+            tempID =  ele.attr("data-id");
+            output.add(new Work(sessionID, tempID));
+        }
+        return output;
+    }
+
+    /**
+     * Connects to a URL and returns a document of html.
+     * Throws an error if the URL can't be connected to, or if connecting returns a bad request.
+     * @param url The url to connect to.
+     * @return A document of HTML.
+     * @throws RuntimeException If the provided URL causes a bad request response.
+     */
+    private org.jsoup.nodes.Document getHTML(String url) throws RuntimeException
+    {
+        Connection connect = Jsoup.connect(url);
+        org.jsoup.nodes.Document page;
+        try
+        {
+            page = connect.cookie("PHPSESSID", sessionID).execute().parse();
+        } catch (IOException e) {
+            throw new RuntimeException("Bad Request");
+        }
+        return page;
     }
 
 
