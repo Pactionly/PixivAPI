@@ -7,6 +7,7 @@ import org.jsoup.select.Elements;
 
 import javax.swing.text.Document;
 import java.io.*;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,7 +50,12 @@ public class API
         return new User(sessionID,id);
     }
 
-    public List<Work> getDailyRankingWorks(int pageNumber)
+    public Work getWork(String id)
+    {
+        return new Work(sessionID, id);
+    }
+
+    public List<Work> getDailyRankingWorks(int pageNumber, Calendar date) throws RuntimeException
     {
         org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=daily&p=" + pageNumber);
 
@@ -64,7 +70,7 @@ public class API
         return output;
     }
 
-    public List<Work> getWeeklyRankingWorks(int pageNumber)
+    public List<Work> getWeeklyRankingWorks(int pageNumber) throws RuntimeException
     {
         org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=weekly&p=" + pageNumber);
 
@@ -79,7 +85,7 @@ public class API
         return output;
     }
 
-    public List<Work> getMonthlyRankingWorks(int pageNumber)
+    public List<Work> getMonthlyRankingWorks(int pageNumber) throws  RuntimeException
     {
         org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=monthly&p=" + pageNumber);
 

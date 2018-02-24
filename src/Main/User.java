@@ -319,6 +319,7 @@ public class User
         name = page.getElementsByClass("user-name").first().text();
 
         // Sets bookmarksSize
+        /*
         ele = page.getElementsByClass("bookmarks-illust");
         if (ele.size() == 0)
         {
@@ -330,6 +331,7 @@ public class User
             temp = temp.substring(temp.indexOf('(') + 1, temp.indexOf(')'));
             bookmarksSize = Integer.parseInt(temp);
         }
+        */
 
         // Sets worksSize
         ele = page.getElementsByClass("works-illust");
