@@ -1,5 +1,5 @@
 
-package Main;
+package Main.PixivAPI;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -10,6 +10,8 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class User
 {
@@ -54,7 +56,7 @@ public class User
      * @return A linked list of user objects, that this user follows.
      * @throws RuntimeException If this object's ID or session are invalid.
      */
-    public List<User> getBookmarkedUsers(int pageNumber) throws RuntimeException
+    public List<User> getBookmarkedUsers(int pageNumber)
     {
         if(!initialized)
         {
@@ -106,7 +108,7 @@ public class User
         {
             initialize();
         }
-        if ((pageNumber * 20) - 19 > getBookmarksSize() || pageNumber < 1)
+        if(pageNumber < 1)
         {
             return null;
         }
@@ -115,6 +117,10 @@ public class User
 
         Document page = getHTML("https://www.pixiv.net/bookmark.php?id=" + ID + "&p=" + pageNumber);
         Elements results = page.getElementsByClass("image-item");
+        if(results.isEmpty())
+        {
+            return null;
+        }
         String tempID;
         for (Element ele : results)
         {
@@ -318,57 +324,37 @@ public class User
         // Sets name
         name = page.getElementsByClass("user-name").first().text();
 
+        Matcher m;
         // Sets bookmarksSize
-        /*
-        ele = page.getElementsByClass("bookmarks-illust");
-        if (ele.size() == 0)
-        {
-            bookmarksSize = 0;
-        }
-        else
-        {
-            temp = ele.first().child(2).child(0).text();
-            temp = temp.substring(temp.indexOf('(') + 1, temp.indexOf(')'));
-            bookmarksSize = Integer.parseInt(temp);
-        }
-        */
+        page = getHTML("https://www.pixiv.net/bookmark.php?id=" + ID);
+        ele = page.getElementsByClass("count-badge");
+
+        temp = ele.first().text();
+        temp = Pattern.compile("[^\\d]").matcher(temp).replaceAll("");
+        bookmarksSize = Integer.parseInt(temp);
+
 
         // Sets worksSize
-        ele = page.getElementsByClass("works-illust");
-        if (ele.size() == 0)
-        {
-            worksSize = 0;
-        }
-        else
-        {
-            temp = ele.first().getElementsByAttributeValueContaining("href","member_illust").text();
-            temp = temp.substring(temp.indexOf('(') + 1, temp.indexOf(')'));
-            worksSize = Integer.parseInt(temp);
-        }
+        page = getHTML("https://www.pixiv.net/member_illust.php?id=" + ID);
+        ele = page.getElementsByClass("count-badge");
+
+        temp = ele.first().text();
+        temp = Pattern.compile("[^\\d]").matcher(temp).replaceAll("");
+        worksSize = Integer.parseInt(temp);
 
         // Sets bookmarkedUsersSize
-        ele = page.getElementsByClass("following-unit");
-        if (ele.size() == 0)
-        {
-            bookmarkedUsersSize = 0;
-        }
-        else
-        {
-            temp =  ele.first().child(1).text();
-            bookmarkedUsersSize = Integer.parseInt(temp);
-        }
+        page = getHTML("https://www.pixiv.net/bookmark.php?type=user&id=" + ID);
+        ele = page.getElementsByClass("count-badge");
+
+        temp = ele.first().text();
+        bookmarkedUsersSize = Integer.parseInt(temp);
 
         // Sets myPixivSize
-        ele = page.getElementsByClass("mypixiv-unit");
-        if (ele.size() == 0)
-        {
-            myPixivSize = 0;
-        }
-        else
-        {
-            temp =  ele.first().child(1).text();
-            myPixivSize = Integer.parseInt(temp);
-        }
+        page = getHTML("https://www.pixiv.net/mypixiv_all.php?id=" + ID);
+        ele = page.getElementsByClass("count-badge");
+
+        temp = ele.first().text();
+        myPixivSize = Integer.parseInt(temp);
 
         // Marks completed
         initialized = true;

@@ -1,11 +1,10 @@
-package Main;
+package Main.PixivAPI;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.swing.text.Document;
 import java.io.*;
 import java.util.Calendar;
 import java.util.LinkedList;

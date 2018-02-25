@@ -1,4 +1,4 @@
-package Main;
+package Main.PixivAPI;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -24,7 +24,7 @@ public class Work
     private String caption;
     private String date;
     private List<String> imageURL;
-    private WorksType type;
+    private WorkType type;
     private List<String> tags;
     private String title;
     private int views;
@@ -124,15 +124,15 @@ public class Work
     /**
      * Returns the type of this work.
      * Possible values:
-     *   WorksType.ILLUSTRATION is for single images
-     *   WorksType.MANGA is for multiple images
-     *   WorksType.UGOIRA is for animations
-     *   WorksType.UNKNOWN is for anything else
+     *   WorkType.ILLUSTRATION is for single images
+     *   WorkType.MANGA is for multiple images
+     *   WorkType.UGOIRA is for animations
+     *   WorkType.UNKNOWN is for anything else
      *
-     * @return A WorksType specifying the type of work this is.
+     * @return A WorkType specifying the type of work this is.
      * @throws RuntimeException If this object's ID or session are invalid.
      */
-    public WorksType getType() throws RuntimeException
+    public WorkType getType() throws RuntimeException
     {
         if(!initialized)
         {
@@ -301,16 +301,16 @@ public class Work
         switch(temp)
         {
             case "_work":
-                type = WorksType.ILLUSTRATION;
+                type = WorkType.ILLUSTRATION;
                 break;
             case "_work multiple":
-                type = WorksType.MANGA;
+                type = WorkType.MANGA;
                 break;
             case "_work ugoku-illust":
-                type = WorksType.UGOIRA;
+                type = WorkType.UGOIRA;
                 break;
             default:
-                type = WorksType.UNKNOWN;
+                type = WorkType.UNKNOWN;
                 break;
         }
 
