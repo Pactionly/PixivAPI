@@ -7,8 +7,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,9 +23,9 @@ public class Work
     private String authorName;
     private String caption;
     private String date;
-    private List<String> imageURL;
+    private Vector<String> imageURL;
     private WorkType type;
-    private List<String> tags;
+    private Vector<String> tags;
     private String title;
     private int views;
     private int likes;
@@ -109,7 +109,7 @@ public class Work
      * For Manga(Multiple images) this list contains as many elements as there are images.
      * For Ugoira(Animations) this list contains a single element, linking a zipped folder of all the
      * frames of the animation.
-     * @return A linked list of image URLs
+     * @return A vector of image URLs
      * @throws RuntimeException If this object's ID or session are invalid.
      */
     public List<String> getImageURL() throws RuntimeException
@@ -142,7 +142,7 @@ public class Work
     }
 
     /**
-     * Returns a linked list of the tags attached to this work.
+     * Returns a list of the tags attached to this work.
      * @return A list of the tags of this work.
      * @throws RuntimeException If this object's ID or session are invalid.
      */
@@ -314,7 +314,7 @@ public class Work
                 break;
         }
 
-        imageURL = new LinkedList<>();
+        imageURL = new Vector<>();
         switch (type)
         {
             case ILLUSTRATION:
@@ -358,11 +358,11 @@ public class Work
                 break;
         }
 
-        tags = new LinkedList<>();
+        tags = new Vector<>();
         ele = page.getElementsByClass("text").select("a");
         for (Element e : ele)
         {
-            tags.add(e.text());
+            tags.add(e.ownText());
         }
 
         title = page.getElementsByClass("title").get(1).text();

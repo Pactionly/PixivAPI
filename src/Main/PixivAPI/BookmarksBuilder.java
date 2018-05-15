@@ -7,28 +7,29 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.Vector;
+import java.util.regex.Pattern;
 
-public class Bookmarks
+public class BookmarksBuilder
 {
     final private String sessionID;
     final private String ID;
 
     private String order = "";
-    private int page = -1;
+    private int pageNumber = -1;
 
-    Bookmarks(String sessionID, String ID)
+    BookmarksBuilder(String sessionID, String ID)
     {
         this.sessionID = sessionID;
         this.ID = ID;
     }
 
-    public Bookmarks page(int page)
+    public BookmarksBuilder page(int page)
     {
-        this.page = page;
+        this.pageNumber = page;
         return this;
     }
 
-    public Bookmarks order(BookmarkOrder order)
+    public BookmarksBuilder order(BookmarkOrder order)
     {
         switch (order)
         {
@@ -61,7 +62,7 @@ public class Bookmarks
         try
         {
             connect = Jsoup.connect("https://www.pixiv.net/bookmark.php?id=" + ID + "&order=" + order +
-                "&p=" + page);
+                "&p=" + pageNumber);
             html = connect.cookie("PHPSESSID", sessionID).execute().parse();
         }
         catch(Exception e)
@@ -70,10 +71,10 @@ public class Bookmarks
         }
 
         String temp = html.getElementsByClass("count-badge").first().text();
-        temp = temp.substring(0, temp.length() - 7);
+        temp = Pattern.compile("[^\\d]").matcher(temp).replaceAll("");
         totalNumber = Integer.parseInt(temp);
 
-        if(page != -1)
+        if(pageNumber != -1)
         {
             results = new Vector<Work>(20);
         }
@@ -89,7 +90,7 @@ public class Bookmarks
             temp = temp.substring(temp.indexOf("illust_id=") + 10);
             results.add(new Work(sessionID, temp));
         }
-        if(page != -1)
+        if(pageNumber != -1)
         {
             return results;
         }

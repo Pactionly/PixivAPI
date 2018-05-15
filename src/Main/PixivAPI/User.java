@@ -8,9 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
+import java.util.Vector;
 import java.util.regex.Pattern;
 
 public class User
@@ -50,24 +49,25 @@ public class User
 
     /**
      * Gets a page of users that this user has bookmarked.(Also known as following)
-     * This function returns null if the requested page doesn't exist, and throws exceptions if the
-     * object calling the function is invalid.
-     * @param pageNumber The page of followed Users to get.
-     * @return A linked list of user objects, that this user follows.
+     * This function returns an empty vector if the requested page doesn't exist, and throws exceptions if the
+     * object calling the function is invalid, or if the pageNumber given is less than one.
+     * @param pageNumber The page of followed Users to get. Must be greater than 0.
+     * @return A list of user objects that this user follows.
      * @throws RuntimeException If this object's ID or session are invalid.
+     * @throws IllegalArgumentException If the pageNumber is less than 1.
      */
     public List<User> getBookmarkedUsers(int pageNumber)
     {
+        if (pageNumber < 1)
+        {
+            throw new IllegalArgumentException("pageNumber cannot be less than 1");
+        }
         if(!initialized)
         {
             initialize();
         }
-        if ((pageNumber * 48) - 47 > getBookmarkedUsersSize() || pageNumber < 1)
-        {
-            return null;
-        }
 
-        LinkedList<User> output = new LinkedList<>();
+        Vector<User> output = new Vector<>(48);
 
         Document page = getHTML("https://www.pixiv.net/bookmark.php?type=user&id=" + ID + "&p=" + pageNumber);
         Elements results = page.getElementById("search-result").child(0).child(0).children();
@@ -97,23 +97,24 @@ public class User
 
     /**
      * Gets a page of works that this user has bookmarked.
-     * This function returns null if the requested page doesn't exist.
-     * @param pageNumber The page of bookmarked works to get.
-     * @return A linked list of works that this user has bookmarked.
+     * This function returns an empty list if the requested page doesn't exist.
+     * @param pageNumber The page of bookmarked works to get. Must be greater than 0.
+     * @return A list of works that this user has bookmarked.
      * @throws RuntimeException If this object's ID or session are invalid.
+     * @throws IllegalArgumentException If the pageNumber is less than 1.
      */
     public List<Work> getBookmarks(int pageNumber) throws RuntimeException
     {
+        if(pageNumber < 1)
+        {
+            throw new IllegalArgumentException("pageNumber cannot be less than 1");
+        }
         if(!initialized)
         {
             initialize();
         }
-        if(pageNumber < 1)
-        {
-            return null;
-        }
 
-        LinkedList<Work> output = new LinkedList<>();
+        Vector<Work> output = new Vector<>(20);
 
         Document page = getHTML("https://www.pixiv.net/bookmark.php?id=" + ID + "&p=" + pageNumber);
         Elements results = page.getElementsByClass("image-item");
@@ -158,23 +159,24 @@ public class User
 
     /**
      * Gets a page of works that this user has created.
-     * Returns null if the page doesn't exist.
-     * @param pageNumber The page of works to get.
-     * @return A linked list of works by this user.
+     * Returns empty list if the page doesn't exist.
+     * @param pageNumber The page of works to get. Must be greater than 0.
+     * @return A list of works by this user.
      * @throws RuntimeException If this object's ID or session are invalid.
+     * @throws IllegalArgumentException If pageNumber is less than 1.
      */
     public List<Work> getWorks(int pageNumber) throws RuntimeException
     {
+        if(pageNumber < 1)
+        {
+            throw new IllegalArgumentException("pageNumber cannot be less than 1");
+        }
         if(!initialized)
         {
             initialize();
         }
-        if ((pageNumber * 20) - 19 > getWorksSize() || pageNumber < 1)
-        {
-            return null;
-        }
 
-        LinkedList<Work> output = new LinkedList<>();
+        Vector<Work> output = new Vector<>(20);
 
         Document page = getHTML("https://www.pixiv.net/member_illust.php?id=" + ID + "&p=" + pageNumber);
         Elements results = page.getElementsByClass("image-item");
@@ -215,22 +217,23 @@ public class User
 
     /**
      * Gets a page of this user's "My pixiv" users.
-     * @param pageNumber The page of users to get.
-     * @return A linked list of users.
+     * @param pageNumber The page of users to get. Must be greater than 0.
+     * @return A list of users.
      * @throws RuntimeException If this object's ID or session are invalid.
+     * @throws IllegalArgumentException If pageNumber is less than 1.
      */
     public List<User> getMyPixiv(int pageNumber) throws RuntimeException
     {
+        if(pageNumber < 1)
+        {
+            throw new IllegalArgumentException("pageNumber cannot be less than 1");
+        }
         if(!initialized)
         {
             initialize();
         }
-        if ((pageNumber * 18) - 17 > getMyPixivSize() || pageNumber < 1)
-        {
-            return null;
-        }
 
-        LinkedList<User> output = new LinkedList<>();
+        Vector<User> output = new Vector<>(48);
 
         Document page = getHTML("https://www.pixiv.net/mypixiv_all.php?id=" + ID + "&p=" + pageNumber);
         Elements results = page.getElementsByClass("member-item");
@@ -301,7 +304,7 @@ public class User
      * validated.
      * @throws RuntimeException If this object's ID or session are invalid.
      */
-    public void initialize() throws RuntimeException
+    public void initialize() throws RuntimeException //TODO Split into multiple functions reduce page loads
     {
         Elements ele;
         String temp;
@@ -324,7 +327,6 @@ public class User
         // Sets name
         name = page.getElementsByClass("user-name").first().text();
 
-        Matcher m;
         // Sets bookmarksSize
         page = getHTML("https://www.pixiv.net/bookmark.php?id=" + ID);
         ele = page.getElementsByClass("count-badge");
