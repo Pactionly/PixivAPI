@@ -1,0 +1,6 @@
+package Main.PixivAPI;
+
+public enum RankingType
+{
+    DAILY, WEEKLY, MONTHLY, ROOKIE, ORIGINAL, MALE, FEMALE, DAILY_R18, WEEKLY_R18, MALE_R18, FEMALE_R18, R18G
+}

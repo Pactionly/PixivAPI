@@ -16,9 +16,9 @@ public class API
     final String USER_AGENT = "Mozilla/5.0";
     private String sessionID;
 
-    API()
+    public API(String sessionID)
     {
-
+        this.sessionID = sessionID;
     }
 
 
@@ -54,49 +54,10 @@ public class API
         return new Work(sessionID, id);
     }
 
-    public List<Work> getDailyRankingWorks(int pageNumber, Calendar date) throws RuntimeException
+    //TODO viewing restriction tests (user set to not show r18, search anyway)
+    public RankingWorksBuilder rankingWorks()
     {
-        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=daily&p=" + pageNumber);
-
-        LinkedList<Work> output = new LinkedList<>();
-        Elements result = page.getElementsByClass("ranking-item");
-        String tempID;
-        for(Element ele : result)
-        {
-           tempID =  ele.attr("data-id");
-           output.add(new Work(sessionID, tempID));
-        }
-        return output;
-    }
-
-    public List<Work> getWeeklyRankingWorks(int pageNumber) throws RuntimeException
-    {
-        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=weekly&p=" + pageNumber);
-
-        LinkedList<Work> output = new LinkedList<>();
-        Elements result = page.getElementsByClass("ranking-item");
-        String tempID;
-        for(Element ele : result)
-        {
-            tempID =  ele.attr("data-id");
-            output.add(new Work(sessionID, tempID));
-        }
-        return output;
-    }
-
-    public List<Work> getMonthlyRankingWorks(int pageNumber) throws  RuntimeException
-    {
-        org.jsoup.nodes.Document page = getHTML("https://www.pixiv.net/ranking.php?mode=monthly&p=" + pageNumber);
-
-        LinkedList<Work> output = new LinkedList<>();
-        Elements result = page.getElementsByClass("ranking-item");
-        String tempID;
-        for(Element ele : result)
-        {
-            tempID =  ele.attr("data-id");
-            output.add(new Work(sessionID, tempID));
-        }
-        return output;
+        return new RankingWorksBuilder(sessionID);
     }
 
     /**
