@@ -278,7 +278,7 @@ public class Work
         ele = page.getElementsByClass("error-title");
         if(ele.size() != 0)
         {
-            throw new RuntimeException("Bad User ID");
+            throw new RuntimeException("Bad Work ID");
         }
 
         // Checks Session ID is valid

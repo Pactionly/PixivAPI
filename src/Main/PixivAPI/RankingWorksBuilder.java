@@ -103,7 +103,7 @@ public class RankingWorksBuilder
     public RankingWorksBuilder date(Calendar date)
     {
         this.date = String.format("%04d", date.get(Calendar.YEAR));
-        this.date += String.format("%02d", date.get(Calendar.MONTH));
+        this.date += String.format("%02d", date.get(Calendar.MONTH) + 1); //TODO Consider different format
         this.date += String.format("%02d", date.get(Calendar.DAY_OF_MONTH));
         return this;
     }
