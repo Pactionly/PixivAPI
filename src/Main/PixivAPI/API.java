@@ -21,7 +21,9 @@ public class API
         try {
             Connection con = Jsoup.connect(
                     "https://accounts.pixiv.net/login");
-            Connection.Response response = con.userAgent(USER_AGENT).execute();
+            Connection.Response response = con.userAgent(USER_AGENT)
+                    .cookie("PHPSESSID", "ABC123")
+                    .execute();
             String postKey = response.parse().getElementsByAttributeValueContaining("name","post_key")
                     .attr("value");
             String postBody = "pixiv_id=" + username + "&password=" + password + "&post_key=" + postKey;

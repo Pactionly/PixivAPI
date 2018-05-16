@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Vector;
 
@@ -66,6 +66,7 @@ public class RankingWorksBuilder
                 break;
             case R18G:
                 mode = "r18g";
+                break;
         }
         return this;
     }
@@ -100,11 +101,17 @@ public class RankingWorksBuilder
         return this;
     }
 
-    public RankingWorksBuilder date(Calendar date)
+    public RankingWorksBuilder date(LocalDate date)
     {
-        this.date = String.format("%04d", date.get(Calendar.YEAR));
-        this.date += String.format("%02d", date.get(Calendar.MONTH) + 1); //TODO Consider different format
-        this.date += String.format("%02d", date.get(Calendar.DAY_OF_MONTH));
+        this.date = String.format("%04d", date.getYear());
+        this.date += String.format("%02d", date.getMonthValue());
+        this.date += String.format("%02d", date.getDayOfMonth());
+        return this;
+    }
+
+    public RankingWorksBuilder date(String date)
+    {
+        this.date = date;
         return this;
     }
 
