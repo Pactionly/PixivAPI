@@ -6,6 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.util.List;
 import java.util.Vector;
 
 public class BookmarkedUsersBuilder
@@ -13,33 +14,89 @@ public class BookmarkedUsersBuilder
     final private String sessionID;
     final private String ID;
 
-    private int pageNumber = -1;
+    private int pageNumber;
 
     BookmarkedUsersBuilder(String sessionID, String ID)
     {
         this.sessionID = sessionID;
         this.ID = ID;
+        this.pageNumber = 1;
     }
 
     public BookmarkedUsersBuilder page(int page)
     {
+        if(page < 1)
+        {
+            throw new IllegalArgumentException("pageNumber cannot be less than 1");
+        }
         pageNumber = page;
         return this;
     }
 
-    public Vector<User> get()
+    public List<User> get()
     {
-        Vector<User> results = new Vector<User>(48);
-        Document html = null;
-        Elements userList = null;
+        Vector<User> results = new Vector<>(48);
+        Document html;
+        Elements userList;
         Connection con;
-        int currentPage = (pageNumber == -1) ? 1 : pageNumber;
-        do
+        try
         {
+            con = Jsoup.connect("https://www.pixiv.net/bookmark.php?id=" + ID + "&type=user" +
+                    "&p=" + pageNumber);
+            html = con.cookie("PHPSESSID", sessionID).execute().parse();
+        }
+        catch (java.io.IOException e)
+        {
+            throw new RuntimeException("Bad Request");
+        }
+        userList = html.getElementsByClass("userdata");
+        for(Element ele : userList)
+        {
+            results.add(new User(sessionID, ele.child(0).attr("data-user_id")));
+        }
+
+        return results;
+    }
+
+    public List<User> getAll()
+    {
+        Vector<User> results;
+        Document html;
+        Elements userList;
+        Connection con;
+        int currentPage = 1;
+        int totalBookmarks;
+        try
+        {
+            con = Jsoup.connect("https://www.pixiv.net/bookmark.php?id=" + ID + "&type=user" +
+                    "&p=" + currentPage);
+            html = con.cookie("PHPSESSID", sessionID).execute().parse();
+        }
+        catch (java.io.IOException e)
+        {
+            throw new RuntimeException("Bad Request");
+        }
+
+        Elements ele;
+        ele = html.getElementsByClass("count-badge");
+        String temp;
+        temp = ele.first().text();
+        totalBookmarks = Integer.parseInt(temp);
+        results = new Vector<>(totalBookmarks);
+
+        userList = html.getElementsByClass("userdata");
+        for(Element e : userList)
+        {
+            results.add(new User(sessionID, e.child(0).attr("data-user_id")));
+        }
+
+        while(totalBookmarks > results.size())
+        {
+            currentPage++;
             try
             {
-                con = Jsoup.connect("https://www.pixiv.net/bookmark.php?id=7210261&type=user" +
-                        "&p=" + pageNumber);
+                con = Jsoup.connect("https://www.pixiv.net/bookmark.php?id=" + ID + "&type=user" +
+                        "&p=" + currentPage);
                 html = con.cookie("PHPSESSID", sessionID).execute().parse();
             }
             catch (java.io.IOException e)
@@ -47,12 +104,11 @@ public class BookmarkedUsersBuilder
                 throw new RuntimeException("Bad Request");
             }
             userList = html.getElementsByClass("userdata");
-            for(Element ele : userList)
+            for(Element e : userList)
             {
-                results.add(new User(sessionID, ele.child(0).attr("data-user_id")));
+                results.add(new User(sessionID, e.child(0).attr("data-user_id")));
             }
-        }while(pageNumber == -1 && userList.size() == 48);
-
+        }
         return results;
     }
 }

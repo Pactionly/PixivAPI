@@ -311,6 +311,7 @@ public class Work
                 break;
             default:
                 type = WorkType.UNKNOWN;
+                System.err.println("Failed to parse work type.");
                 break;
         }
 

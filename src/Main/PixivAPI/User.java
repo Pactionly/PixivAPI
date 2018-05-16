@@ -20,6 +20,7 @@ public class User
     private String ID;
     private String name;
     private String url;
+
     private int bookmarkedUsersSize;
     private int worksSize;
     private int bookmarksSize;
@@ -32,6 +33,11 @@ public class User
         this.ID = ID;
         this.url = "https://www.pixiv.net/member.php?id=" + ID;
         this.initialized = false;
+
+        this.bookmarkedUsersSize = -1;
+        this.worksSize = -1;
+        this.bookmarksSize = -1;
+        this.myPixivSize = -1;
     }
 
     /**
@@ -47,38 +53,9 @@ public class User
         return o instanceof User && ((User) o).ID.equals(this.ID);
     }
 
-    /**
-     * Gets a page of users that this user has bookmarked.(Also known as following)
-     * This function returns an empty vector if the requested page doesn't exist, and throws exceptions if the
-     * object calling the function is invalid, or if the pageNumber given is less than one.
-     * @param pageNumber The page of followed Users to get. Must be greater than 0.
-     * @return A list of user objects that this user follows.
-     * @throws RuntimeException If this object's ID or session are invalid.
-     * @throws IllegalArgumentException If the pageNumber is less than 1.
-     */
-    public List<User> getBookmarkedUsers(int pageNumber)
+    public BookmarkedUsersBuilder bookmarkedUsers()
     {
-        if (pageNumber < 1)
-        {
-            throw new IllegalArgumentException("pageNumber cannot be less than 1");
-        }
-        if(!initialized)
-        {
-            initialize();
-        }
-
-        Vector<User> output = new Vector<>(48);
-
-        Document page = getHTML("https://www.pixiv.net/bookmark.php?type=user&id=" + ID + "&p=" + pageNumber);
-        Elements results = page.getElementById("search-result").child(0).child(0).children();
-        String tempID;
-        for (Element ele : results)
-        {
-            tempID = ele.child(0).attr("data-user_id");
-            output.add(new User(sessionID, tempID));
-        }
-
-        return output;
+        return new BookmarkedUsersBuilder(sessionID, ID);
     }
 
     /**
